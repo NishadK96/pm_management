@@ -7,6 +7,7 @@ import 'package:ipsum_user/features/create_project/assign_screen.dart';
 import 'package:ipsum_user/features/create_project/calender_screen.dart';
 import 'package:ipsum_user/features/create_project/widgets/custom_card.dart';
 import 'package:ipsum_user/features/create_project/widgets/date_time_row.dart';
+import 'package:ipsum_user/features/create_project/widgets/priority_card.dart';
 
 
 class CreateProjectScreen extends StatefulWidget {
@@ -272,7 +273,7 @@ class _CreateProjectScreenState extends State<CreateProjectScreen> {
                           Navigator.push(
                             context,
                             MaterialPageRoute(
-                              builder: (context) => const  CalenderScreen(),
+                              builder: (context) =>   CalenderScreen(),
                             ),
                           );
                           // CalenderScreen
@@ -321,54 +322,32 @@ class _CreateProjectScreenState extends State<CreateProjectScreen> {
                 ),
               ),
               const SizedBox(height: 16),
-              ListTile(
-                leading: const Icon(Icons.priority_high, color: Colors.red),
-                title: Text(
-                  'High Priority',
-                  style: GoogleFonts.roboto(
-                    color: Colors.black,
-                    fontSize: 18,
-                    fontWeight: FontWeight.w500,
-
-                  ),
-                ),
+              PriorityCard(
+                label:'High Priority' ,
+                color: Color(0xffFF0000),
                 onTap: () {
                   setState(() => selectedPriority = "High");
                   Navigator.pop(context);
                 },
               ),
-              ListTile(
-                leading: const Icon(Icons.priority_high, color: Colors.orange),
-                title: Text(
-                  'Medium Priority',
-                  style: GoogleFonts.roboto(
-                    color: Colors.black,
-                    fontSize: 18,
-                    fontWeight: FontWeight.w500,
-
-                  ),
-                ),
+              PriorityCard(
+                label:'Medium Priority' ,
+                color: Color(0xffF18F1C),
                 onTap: () {
                   setState(() => selectedPriority = "Medium");
                   Navigator.pop(context);
                 },
               ),
-              ListTile(
-                leading: const Icon(Icons.low_priority, color: Colors.green),
-                title: Text(
-                  'Low Priority',
-                  style: GoogleFonts.roboto(
-                    color: Colors.black,
-                    fontSize: 18,
-                    fontWeight: FontWeight.w500,
-
-                  ),
-                ),
+              PriorityCard(
+                label:'Low Priority' ,
+                color: Color(0xff50D166),
                 onTap: () {
                   setState(() => selectedPriority = "Low");
                   Navigator.pop(context);
                 },
               ),
+
+
             ],
           ),
         );

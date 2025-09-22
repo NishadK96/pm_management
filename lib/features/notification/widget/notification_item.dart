@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/flutter_svg.dart';
+import 'package:google_fonts/google_fonts.dart';
+import 'package:ipsum_user/core/constants/icon_constants.dart';
 
 class NotificationItem extends StatelessWidget {
   final String title;
@@ -13,24 +16,37 @@ class NotificationItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Card(
-      elevation: 5,
+    return Container(
+
       margin: const EdgeInsets.symmetric(vertical: 10),
-      child: ListTile(
-        leading: CircleAvatar(
-          backgroundColor: Colors.blueGrey,
-          child: Icon(Icons.notifications, color: Colors.white),
-        ),
-        title: Text(title, style: TextStyle(fontWeight: FontWeight.bold)),
-        subtitle: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
+      child: Container(
+        width: MediaQuery.of(context).size.width,
+        child: Row(
           children: [
-            Text(timeAgo, style: TextStyle(color: Colors.grey)),
-            SizedBox(height: 8),
-            Text(description),
-          ],
-        ),
+          SvgPicture.string(IconConst().notificationBell),
+          SizedBox(width: 10,),
+          Column(children: [
+            Text(
+              'Task created successfully!',
+              style: GoogleFonts.poppins(
+                color: Colors.black,
+                fontSize: 16,
+                fontWeight: FontWeight.w500,
+              ),
+            ),
+            TextField(
+              maxLength: 3,
+              readOnly: true,
+              decoration:  InputDecoration(
+                  border: InputBorder.none,
+                  hintText: "Amet minim mollit non deserunt ullam co est sit aliqua dolor do amet sint. Velit ficia consequat duis enimmollit. ",
+                  hintStyle: GoogleFonts.poppins(fontSize: 14)
+              ),
+            )
+          ],)
+        ],),
       ),
+
     );
   }
 }

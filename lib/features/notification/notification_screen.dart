@@ -1,6 +1,8 @@
 
 
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/flutter_svg.dart';
+import 'package:ipsum_user/core/constants/icon_constants.dart';
 import 'package:ipsum_user/features/notification/widget/notification_item.dart';
 
 class NotificationsScreen extends StatefulWidget {
@@ -19,7 +21,7 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
         child:count==0? Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(Icons.notifications_off, size: 100, color: Colors.grey),
+            SvgPicture.string(IconConst().notificationBell),
             SizedBox(height: 16),
             Text(
               'No Notification Yet',
