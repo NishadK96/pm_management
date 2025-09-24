@@ -9,6 +9,7 @@ import 'package:ipsum_user/features/dashboard/widget/progression_card.dart';
 import 'package:ipsum_user/features/dashboard/widget/project_list.dart';
 import 'package:ipsum_user/features/notification/notification_screen.dart';
 import 'package:ipsum_user/features/profile/profile_screen.dart';
+import 'package:ipsum_user/features/project/project_screen.dart';
 
 import 'widget/dashboard_card.dart';
 
@@ -120,13 +121,24 @@ class DashboardScreen extends StatelessWidget {
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      DashboardCard(
-                        title: "All Project",
-                        count: "0",
-                        subtitle: "Task",
-                        icon: IconConst().projectIcon,
-                        color: Color(0xFFE3F2FD),
-                        iconColor: Color(0xFF1565C0),
+                      GestureDetector(
+                        onTap: (){
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) =>
+                              const ProjectScreen(),
+                            ),
+                          );
+                        },
+                        child: DashboardCard(
+                          title: "All Project",
+                          count: "0",
+                          subtitle: "Task",
+                          icon: IconConst().projectIcon,
+                          color: Color(0xFFE3F2FD),
+                          iconColor: Color(0xFF1565C0),
+                        ),
                       ),
                       DashboardCard(
                         title: "Approvals",

@@ -28,6 +28,8 @@ class NotificationItem extends StatelessWidget {
             SvgPicture.string(IconConst().notificationBell),
             SizedBox(width: 10),
             Column(
+              mainAxisAlignment: MainAxisAlignment.start,
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Row(
                   children: [
@@ -61,6 +63,53 @@ class NotificationItem extends StatelessWidget {
                     ),
                   ),
                 ),
+                SizedBox(height: 10,),
+                Row(
+                  children: [
+                    Container(
+                      width: 87,
+                      padding: EdgeInsets.symmetric(vertical: 6),
+                      // height: 29,
+                      decoration: ShapeDecoration(
+                        color: Colors.white,
+                        shape: RoundedRectangleBorder(
+                          side: BorderSide(
+                            width: 1,
+                            color: const Color(0xFF2E60C1),
+                          ),
+                          borderRadius: BorderRadius.circular(6),
+                        ),
+                      ),
+                      alignment: Alignment.center,
+                      child: Text(
+                        'Cancel',
+                        style: GoogleFonts.poppins(
+                          color: const Color(0xFF2E60C1),
+                          fontSize: 10,
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
+                    ),
+                    SizedBox(width: 10,),
+                    Container(
+                      width: 87,
+                      padding: EdgeInsets.symmetric(vertical: 6),
+                      decoration: ShapeDecoration(
+                        color: const Color(0xFF2E60C1),
+                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(6)),
+                      ),
+                      alignment: Alignment.center,
+                      child: Text(
+                        'Accept',
+                        style: GoogleFonts.poppins(
+                          color: Colors.white,
+                          fontSize: 10,
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
+                    )
+                  ],
+                )
                 // TextField(
                 //   maxLength: 3,
                 //   readOnly: true,
