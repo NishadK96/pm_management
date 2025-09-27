@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:ipsum_user/core/theme/app_colors.dart';
+import 'package:ipsum_user/core/widgets/long_button.dart';
 import 'package:ipsum_user/features/dashboard/dashboard_screen.dart';
 
 class Login extends StatelessWidget {
@@ -62,30 +63,16 @@ class Login extends StatelessWidget {
                         const SizedBox(height: 15),
                         _buildTextField("Employee code", false),
                         const SizedBox(height: 40),
-                        SizedBox(
-                          width: double.infinity,
-                          height: 50,
-                          child: ElevatedButton(
-                            onPressed: () {
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (context) => const DashboardScreen(),
-                                ),
-                              );
-                            },
-                            style: ElevatedButton.styleFrom(
-                              backgroundColor: AppColors.primary,
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(6),
-                              ),
+                        LongButton(
+                          onTap: (){ Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => const DashboardScreen(),
                             ),
-                            child: const Text(
-                              "Login",
-                              style: TextStyle(fontSize: 16,color: Colors.white),
-                            ),
-                          ),
+                          );},
+                          label: "Login",
                         ),
+
                       ],
                     ),
                   ),

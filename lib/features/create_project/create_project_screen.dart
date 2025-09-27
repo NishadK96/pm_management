@@ -3,6 +3,7 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:ipsum_user/core/constants/icon_constants.dart';
 import 'package:ipsum_user/core/theme/app_colors.dart';
+import 'package:ipsum_user/core/widgets/long_button.dart';
 import 'package:ipsum_user/features/create_project/assign_screen.dart';
 import 'package:ipsum_user/features/create_project/calender_screen.dart';
 import 'package:ipsum_user/features/create_project/widgets/custom_card.dart';
@@ -259,36 +260,19 @@ class _CreateProjectScreenState extends State<CreateProjectScreen> {
                       ),
                     ),
                     const SizedBox(height: 20),
-                    SizedBox(
-                      width: double.infinity,
-                      child: ElevatedButton(
-                        style: ElevatedButton.styleFrom(
-                          padding: const EdgeInsets.symmetric(vertical: 16),
-                          backgroundColor: AppColors.primary,
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(8),
+                    Padding(
+                      padding: const EdgeInsets.symmetric(vertical: 16),
+                      child:LongButton(label: 'Save', onTap: (){
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) =>   CalenderScreen(),
                           ),
-                        ),
-                        onPressed: () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) =>   CalenderScreen(),
-                            ),
-                          );
-                          // CalenderScreen
-                          // TODO: Handle save
-                        },
-                        child:  Text(
-                          'Save',
-                          style: GoogleFonts.roboto(
-                            color: Colors.white,
-                            fontSize: 18,
-                            fontWeight: FontWeight.w500,
-                            height: 1.22,
-                          ),
-                        ),
-                      ),
+                        );
+                      })
+
+
+
                     )
                   ],
                 ),

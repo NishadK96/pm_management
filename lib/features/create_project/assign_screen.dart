@@ -3,6 +3,7 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:ipsum_user/core/constants/icon_constants.dart';
 import 'package:ipsum_user/core/theme/app_colors.dart';
+import 'package:ipsum_user/core/widgets/long_button.dart';
 
 class AssignProjectScreen extends StatefulWidget {
 
@@ -131,36 +132,10 @@ class _AssignProjectScreenState extends State<AssignProjectScreen> {
           SizedBox(height: 40,),
           Container(
             margin: EdgeInsets.symmetric(horizontal: 16),
-            width: double.infinity,
-            height: 60,
-            decoration: ShapeDecoration(
-              color: const Color(0xFF2E60C1),
-              shape: RoundedRectangleBorder(
-                side: BorderSide(
-                  width: 1,
-                  color: const Color(0xFFE6ECF0),
-                ),
-                borderRadius: BorderRadius.circular(10),
-              ),
-              shadows: [
-                BoxShadow(
-                  color: Color(0x05000000),
-                  blurRadius: 8,
-                  offset: Offset(1, 1),
-                  spreadRadius: 0,
-                )
-              ],
-            ),
-            alignment: Alignment.center,
-            child: Text(
-              'Assign Project',
-              style: GoogleFonts.roboto(
-                color: Colors.white,
-                fontSize: 18,
-                fontWeight: FontWeight.w500,
-                height: 1.22,
-              ),
-            ),
+
+            child:LongButton(label:  'Assign Project' , onTap: (){})
+
+
           )
         ],
       ),

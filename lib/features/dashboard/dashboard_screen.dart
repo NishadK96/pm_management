@@ -4,6 +4,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:ipsum_user/core/constants/icon_constants.dart';
 import 'package:ipsum_user/core/theme/app_colors.dart';
 import 'package:ipsum_user/features/create_project/create_project_screen.dart';
+import 'package:ipsum_user/features/dashboard/widget/count_down_card.dart';
 import 'package:ipsum_user/features/dashboard/widget/dashboard_button.dart';
 import 'package:ipsum_user/features/dashboard/widget/progression_card.dart';
 import 'package:ipsum_user/features/dashboard/widget/project_list.dart';
@@ -27,6 +28,7 @@ class DashboardScreen extends StatelessWidget {
           children: [
             Column(
               children: [
+
                 Container(
                   width: double.infinity,
                   padding: EdgeInsets.symmetric(horizontal: 16, vertical: 30),
@@ -114,6 +116,8 @@ class DashboardScreen extends StatelessWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
+                  CountDownCard(),
+                  const SizedBox(height: 20),
                   // Project progress section
                   ProgressionCard(),
 

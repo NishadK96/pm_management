@@ -124,12 +124,12 @@ class ProjectList extends StatelessWidget {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   Row(
-                    children: const [
-                      Icon(Icons.calendar_month, size: 16, color: Colors.black54),
+                    children:  [
+                      SvgPicture.string(IconConst().calenderIcon,),
                       SizedBox(width: 4),
                       Text("12 Jan 2025", style: TextStyle(fontSize: 12)),
                       SizedBox(width: 12),
-                      Icon(Icons.flag, size: 16, color: Colors.black54),
+                      SvgPicture.string(IconConst().flagIcon,),
                       SizedBox(width: 4),
                       Text("20 Sep 2025", style: TextStyle(fontSize: 12)),
                     ],
