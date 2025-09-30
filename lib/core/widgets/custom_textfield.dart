@@ -1,8 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:ipsum_user/core/theme/app_colors.dart';
 class CustomTextField extends StatelessWidget {
+  final bool isLogin;
   final String? label;
-  const CustomTextField({super.key,required this.label});
+  final TextEditingController? controller;
+  final String? hint;
+  final  bool? isPassword;
+  const CustomTextField({super.key, this.label,this.isLogin=false,this.controller,this.hint,this.isPassword});
 
   @override
   Widget build(BuildContext context) {
@@ -10,7 +15,7 @@ class CustomTextField extends StatelessWidget {
       mainAxisAlignment: MainAxisAlignment.start,
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(
+        ?isLogin? null: Text(
           label??'Full name',
           style: GoogleFonts.poppins(
             color: Colors.black,
@@ -18,9 +23,25 @@ class CustomTextField extends StatelessWidget {
             fontWeight: FontWeight.w500,
           ),
         ),
-        SizedBox(height: 5,),
+        ?isLogin? null:SizedBox(height: 5,),
+
         TextField(
-          decoration: InputDecoration(
+          controller: controller,
+          obscureText: isPassword??false,
+          decoration:isLogin?InputDecoration(
+            hintText: hint,
+            hintStyle: TextStyle(
+                color: AppColors.labelGrey
+            ),
+            border: OutlineInputBorder(borderRadius: BorderRadius.circular(8),borderSide: BorderSide(color: AppColors.grey)),
+            disabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(8),borderSide: BorderSide(color: AppColors.grey)),
+            focusedBorder:  OutlineInputBorder(borderRadius: BorderRadius.circular(8),borderSide: BorderSide(color: AppColors.primary)),
+            enabledBorder:  OutlineInputBorder(borderRadius: BorderRadius.circular(8),borderSide: BorderSide(color: AppColors.grey)),
+            contentPadding: const EdgeInsets.symmetric(
+              horizontal: 12,
+              vertical: 14,
+            ),
+          ) :InputDecoration(
 
               fillColor: Color(0xFFF4F4F4),
               border: OutlineInputBorder(

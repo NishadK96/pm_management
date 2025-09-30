@@ -5,7 +5,8 @@ import 'package:ipsum_user/core/theme/app_colors.dart';
 class LongButton extends StatelessWidget {
   final String label;
   final VoidCallback onTap;
-  const LongButton({super.key,required this.label,required this.onTap});
+  final bool? isLoading;
+  const LongButton({super.key,required this.label,required this.onTap,this.isLoading=false});
 
   @override
   Widget build(BuildContext context) {
@@ -34,8 +35,14 @@ class LongButton extends StatelessWidget {
           ],
         ),
         alignment: Alignment.center,
-        child: Text(
-          label??'Assign Project',
+        child: isLoading==true?  const SizedBox(
+            width: 20,
+            height: 20,
+            child: CircularProgressIndicator(
+              strokeWidth: 1.5,
+              color: Colors.white,
+            )):Text(
+          label,
           style: GoogleFonts.roboto(
             color: Colors.white,
             fontSize: 18,

@@ -1,9 +1,24 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 
+import 'core/utils/authenticate.dart';
+import 'features/dashboard/dashboard_screen.dart';
+import 'features/login/bloc/login_bloc.dart';
 import 'features/login/login.dart';
 
-void main() {
-  runApp(const MyApp());
+void main() async{
+  WidgetsFlutterBinding.ensureInitialized();
+  await authentication.init();
+  SystemChrome.setPreferredOrientations([
+    DeviceOrientation.portraitUp,
+  ]).then((value) =>  runApp(MultiBlocProvider(providers: [
+      BlocProvider(
+      create: (context) => LoginBloc(),
+      )
+  ],
+    child:
+    const MyApp())));
 }
 
 class MyApp extends StatelessWidget {
@@ -18,7 +33,7 @@ class MyApp extends StatelessWidget {
 
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.white),
       ),
-      home: const Login(),
+      home: authentication.isAuthenticated?DashboardScreen():const Login(),
     );
   }
 }

@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:ipsum_user/core/constants/icon_constants.dart';
-import 'dart:async';
+
 
 import 'package:ipsum_user/core/theme/app_colors.dart';
 class CountDownCard extends StatefulWidget {
