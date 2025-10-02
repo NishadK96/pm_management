@@ -1,13 +1,27 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:ipsum_user/core/constants/icon_constants.dart';
 import 'package:ipsum_user/core/widgets/title_widget.dart';
+import 'package:ipsum_user/features/project/bloc/project_bloc.dart';
 import 'package:ipsum_user/features/project/project_card.dart';
 import 'package:ipsum_user/features/task_detail/task_detail_screen.dart';
 
-class ProjectScreen extends StatelessWidget {
+class ProjectScreen extends StatefulWidget {
   const ProjectScreen({super.key});
+
+  @override
+  State<ProjectScreen> createState() => _ProjectScreenState();
+}
+
+class _ProjectScreenState extends State<ProjectScreen> {
+  @override
+  void initState() {
+    // productList.clear();
+    context.read<ProjectBloc>().add(GetProjects());
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {

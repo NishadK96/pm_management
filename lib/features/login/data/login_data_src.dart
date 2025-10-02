@@ -16,16 +16,17 @@ class LoginDataSource {
     print(PmUrls.loginUrl);
     final response = await client.post(
       PmUrls.loginUrl,
-      data: {
-        "username": "coordinator@gmail.com",
-        "employee_code": "EMP0012",
-        "password": "aDxRJSYy",
-      },
+      data:
       // {
-      //   "username": email,
-      //   "employee_code":employeeCode,
-      //   "password": password,
+      //   "username": "coordinator@gmail.com",
+      //   "employee_code": "EMP0012",
+      //   "password": "aDxRJSYy",
       // },
+      {
+        "username": email,
+        "employee_code":employeeCode,
+        "password": password,
+      },
       options: Options(
         headers: {
           'Content-Type': 'application/json',
@@ -42,6 +43,36 @@ class LoginDataSource {
           authenticatedUser: authenticatedUser,
         );
       }
+      return DoubleResponse(
+        response.data['status'] == 200,
+        response.data['message'],
+      );
+    }
+
+    return DoubleResponse(
+      response.data['status'] ,
+      response.data['message'],
+    );
+  }
+  Future<DoubleResponse> updateAccessToken() async {
+    String? token=authentication.authenticatedUser.refresh;
+    print(PmUrls.tokenUpdateUrl);
+    final response = await client.post(
+      PmUrls.tokenUpdateUrl,
+      data:
+      {
+        "refresh": token,
+      },
+      options: Options(
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept': 'application/json',
+        },
+      ),
+    );
+print(response.data);
+    if (response.data['status'] == 200) {
+
       return DoubleResponse(
         response.data['status'] == 200,
         response.data['message'],

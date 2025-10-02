@@ -19,9 +19,7 @@ class LoginBloc extends Bloc<LoginEvent, LoginState> {
 
   Stream<LoginState> _mapCustomerLoginState(
       {required String email, required String password, required String employeeCode}) async* {
-    print(email);
-    print(password);
-    print(employeeCode);
+
     yield SignInLoading();
     final dataResponse =
     await _dataSource.userLogin(email: email,employeeCode: employeeCode, password: password);

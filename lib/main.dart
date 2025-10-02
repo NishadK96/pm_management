@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:ipsum_user/features/project/bloc/project_bloc.dart';
 
 import 'core/utils/authenticate.dart';
 import 'features/dashboard/dashboard_screen.dart';
@@ -15,7 +16,9 @@ void main() async{
   ]).then((value) =>  runApp(MultiBlocProvider(providers: [
       BlocProvider(
       create: (context) => LoginBloc(),
-      )
+      ), BlocProvider(
+      create: (context) => ProjectBloc(),
+      ),
   ],
     child:
     const MyApp())));
