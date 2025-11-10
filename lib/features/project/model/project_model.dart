@@ -38,7 +38,9 @@ class ProjectModel {
   });
 
   ProjectModel.fromJson(Map<String, dynamic> json) {
+    // print();
     id = json['id'];
+    name=json['name'];
     description = json['description'];
     startDate = json['start_date'];
     dueDate = json['due_date'];
@@ -53,6 +55,7 @@ class ProjectModel {
   Map<String, dynamic> toJson() {
     final Map<String, dynamic> data = <String, dynamic>{};
     data['id'] = id;
+    data['name'] = name;
     data['description'] = description;
     data['start_date'] = startDate;
     data['due_date'] = dueDate;

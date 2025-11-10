@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:ipsum_user/core/constants/icon_constants.dart';
+import 'package:ipsum_user/core/utils/authenticate.dart';
 import 'package:ipsum_user/core/widgets/custom_textfield.dart';
+import 'package:ipsum_user/core/widgets/long_button.dart';
 import 'package:ipsum_user/core/widgets/title_widget.dart';
+import 'package:ipsum_user/features/login/login.dart';
 
 class ProfileDetailsScreen extends StatelessWidget {
   const ProfileDetailsScreen({super.key});
@@ -131,7 +134,17 @@ class ProfileDetailsScreen extends StatelessWidget {
               ),
               SizedBox(height: 16),
               // CustomTextField(label: "Job Details"),
+LongButton(label: "Logout", onTap: (){
+  authentication.clearAuthenticatedTokens();
+  authentication.clearAuthenticatedUser();
+  Navigator.pushAndRemoveUntil(
+      context,
+      MaterialPageRoute(
+        builder: (context) => Login(),
+      ),
+          (route) => false);
 
+}),
               SizedBox(height: 16),
               // ElevatedButton(
               //   onPressed: () {},

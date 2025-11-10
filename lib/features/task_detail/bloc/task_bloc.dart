@@ -6,23 +6,20 @@ import 'package:ipsum_user/core/utils/data_response.dart';
 import 'package:ipsum_user/features/project/data/project_data_src.dart';
 import 'package:ipsum_user/features/project/model/project_model.dart';
 
-part 'project_event.dart';
-part 'project_state.dart';
+part 'task_event.dart';
+part 'task_state.dart';
 
-class ProjectBloc extends Bloc<ProjectEvent, ProjectState> {
+class TaskBloc extends Bloc<TaskEvent, TaskState> {
   final ProjectDataSource _dataSource = ProjectDataSource();
-  ProjectBloc() : super(ProjectListInitial());
+  TaskBloc() : super(TaskListInitial());
   @override
-  Stream<ProjectState> mapEventToState(ProjectEvent event) async* {
-    if (event is GetProjects) {
+  Stream<TaskState> mapEventToState(TaskEvent event) async* {
+    if (event is GetTasks) {
       yield* getProjects();
     }
-    else if (event is GetProjectDetails) {
-      yield* getProjectDetails();
-    }
-    else if (event is CreateProject) {
-      yield* getProjectDetails();
-    }
+    // if (event is GetVariantByProduct) {
+    //   yield* listVariantByProduct(productId: event.productId);
+    // }
     // else if (event is CreateProductEvent) {
     //   yield* createProduct(
     //       name: event.name,
@@ -42,17 +39,17 @@ class ProjectBloc extends Bloc<ProjectEvent, ProjectState> {
     // }
   }
 
-  Stream<ProjectState> getProjects() async* {
-    yield ProjectListLoading();
+  Stream<TaskState> getProjects() async* {
+    yield TaskListInitial();
     final dataResponse = await _dataSource.getProjects();
     if (dataResponse.data1) {
       // print(",,,,,,,,,,,,,${dataResponse.data2[0]['name']}");
-      yield ProjectListSuccess(productList: dataResponse.data2);
+      yield TaskListSuccess(taskList: dataResponse.data2);
     } else {
       yield ProjectListFailed();
     }
   }
-  Stream<ProjectState> getProjectDetails() async* {
+  Stream<TaskState> getProjectDetails() async* {
     yield ProjectDetailsLoading();
     final dataResponse = await _dataSource.projectDetails();
     if (dataResponse.data1) {

@@ -7,12 +7,14 @@ import 'package:ipsum_user/core/widgets/title_widget.dart';
 import 'package:ipsum_user/features/create_project/assign_screen.dart';
 import 'package:ipsum_user/features/create_project/widgets/date_time_row.dart';
 import 'package:ipsum_user/features/create_project/widgets/priority_card.dart';
+import 'package:ipsum_user/features/project/model/project_model.dart';
 import 'package:ipsum_user/features/task_detail/create_new_task_button.dart';
 import 'package:ipsum_user/features/task_detail/task_detail_card.dart'
     show TaskDetailCard;
 
 class TaskDetailScreen extends StatefulWidget {
-  const TaskDetailScreen({super.key});
+  final ProjectModel? data;
+  const TaskDetailScreen({super.key,this.data});
 
   @override
   State<TaskDetailScreen> createState() => _TaskDetailScreenState();
@@ -34,7 +36,7 @@ class _TaskDetailScreenState extends State<TaskDetailScreen> {
       backgroundColor: Colors.white,
       appBar: AppBar(
         backgroundColor: Colors.white,
-        title: TitleWidget(label: 'Web Dev'),
+        title: TitleWidget(label: widget.data?.name??'Web Dev'),
       ),
       body: SingleChildScrollView(
         child: Container(

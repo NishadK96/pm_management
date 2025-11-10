@@ -11,7 +11,7 @@ class ProjectListInitial extends ProjectState {}
 class ProjectListLoading extends ProjectState {}
 
 class ProjectListSuccess extends ProjectState {
-  final  DoubleResponse productList;
+  final List<ProjectModel>  productList;
 
   const ProjectListSuccess({required this.productList});
 }
@@ -26,3 +26,12 @@ class ProjectDetailsSuccess extends ProjectState {
 }
 
 class ProjectDetailsFailed extends ProjectState {}
+class CreateProjectLoading extends ProjectState {}
+
+class CreateProjectSuccess extends ProjectState {
+  final  String msg;
+
+  const CreateProjectSuccess({required this.msg});
+}
+
+class CreatePProjectFailed extends ProjectState {}
