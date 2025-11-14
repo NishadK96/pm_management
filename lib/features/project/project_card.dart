@@ -1,11 +1,21 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-
+import 'package:ipsum_user/features/project/model/project_model.dart';
+import 'package:intl/intl.dart';
 class ProjectCard extends StatelessWidget {
-  const ProjectCard({super.key});
+  final ProjectModel? data;
+  const ProjectCard({super.key,this.data});
 
   @override
   Widget build(BuildContext context) {
+    // start date
+    final startDate = data?.startDate;
+    DateTime parsedDate = DateTime.parse(startDate??"");
+    String formattedDate = DateFormat("dd MMM yyyy").format(parsedDate);
+    // end date
+    final endDate = data?.dueDate;
+    DateTime parsedEndDate = DateTime.parse(endDate??"");
+    String formattedEndDate = DateFormat("dd MMM yyyy").format(parsedEndDate);
     var w=MediaQuery.of(context).size.width;
     return Container(
       width: w,
@@ -30,7 +40,7 @@ class ProjectCard extends StatelessWidget {
                 Row(
                   children: [
                     Text(
-                      'Web Dev',
+                      data?.name??'Web Dev',
                       style: GoogleFonts.poppins(
                         color: Colors.black,
                         fontSize: 18,
@@ -57,7 +67,7 @@ class ProjectCard extends StatelessWidget {
                         ],
                       ),
                       child: Text(
-                        'On Progress',
+                        data?.status??'On Progress',
                         style: GoogleFonts.poppins(
                           color: const Color(0xFFFF9900),
                           fontSize: 13,
@@ -69,13 +79,16 @@ class ProjectCard extends StatelessWidget {
                   ],
                 ),
                 SizedBox(height: 10,),
-                Text(
-                  'Amet minim mollit non deserunt ullamco it aliqua dolor do amet sint. ',
-                  style: GoogleFonts.poppins(
-                    color: const Color(0xFF1B1B1F),
-                    fontSize: 17,
-                    fontWeight: FontWeight.w400,
+                Container(
+                  width: w,
+                  child: Text(
+                   data?.description?? 'Amet minim mollit non deserunt ullamco it aliqua dolor do amet sint. ',
+                    style: GoogleFonts.poppins(
+                      color: const Color(0xFF1B1B1F),
+                      fontSize: 17,
+                      fontWeight: FontWeight.w400,
 
+                    ),
                   ),
                 ),
 
@@ -113,7 +126,7 @@ class ProjectCard extends StatelessWidget {
                     ),
                     SizedBox(width: 5,),
                     Text(
-                      '12 Jun 2022',
+                      formattedDate??'12 Jun 2022',
                       style: GoogleFonts.poppins(
                         color: const Color(0xFF2E60C1),
                         fontSize: 10,
@@ -133,7 +146,7 @@ class ProjectCard extends StatelessWidget {
                     ),
                     SizedBox(width: 5,),
                     Text(
-                      '12 Jun 2022',
+                      formattedEndDate??'12 Jun 2022',
                       style: GoogleFonts.poppins(
                         color: const Color(0xFF2E60C1),
                         fontSize: 10,

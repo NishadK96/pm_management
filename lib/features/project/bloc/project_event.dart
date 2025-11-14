@@ -16,4 +16,13 @@ class GetProjectDetails extends ProjectEvent {
   const GetProjectDetails({
     this.id
 }) ;
+}class CreateProject extends ProjectEvent {
+  final String? name,
+      description,
+      startDate,
+      dueDate,
+      priority;
+  const CreateProject({
+    this.name,this.startDate,this.dueDate,this.description,this.priority
+}) ;
 }

@@ -14,19 +14,24 @@ class LoginDataSource {
   }) async {
     UserModel authenticatedUser;
     print(PmUrls.loginUrl);
+    print(email);
+    print(employeeCode);
+    print(password);
     final response = await client.post(
       PmUrls.loginUrl,
       data:
-      // {
-      //   "username": "coordinator@gmail.com",
-      //   "employee_code": "EMP0012",
-      //   "password": "aDxRJSYy",
-      // },
       {
-        "username": email,
-        "employee_code":employeeCode,
-        "password": password,
+        "username": "coordinator@gmail.com",
+        "employee_code": "EMP0012",
+        "password": "aDxRJSYy",
       },
+      // {
+      //   "username": email,
+      //   "employee_code": employeeCode,
+      //   "password": password
+      // },
+
+
       options: Options(
         headers: {
           'Content-Type': 'application/json',
