@@ -34,7 +34,7 @@ class LoginDataSource {
         },
       ),
     );
-
+print("responseee $response");
     if (response.data['status'] == 200) {
       authenticatedUser = UserModel.fromJson(response.data['data']);
 

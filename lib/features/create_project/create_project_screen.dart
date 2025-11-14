@@ -37,7 +37,7 @@ class _CreateProjectScreenState extends State<CreateProjectScreen> {
         shadowColor: AppColors.dividerGrey,
         title:  Text('Create Project',style: GoogleFonts.poppins(fontSize: 24,fontWeight: FontWeight.w400),),
         leading: const BackButton(),
-        actionsPadding: EdgeInsets.only(right: 20),
+        // actionsPadding: EdgeInsets.only(right: 20),
         actions: [
         SvgPicture.string(IconConst().moreIcon)
         ],

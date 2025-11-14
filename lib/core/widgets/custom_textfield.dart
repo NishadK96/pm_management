@@ -15,7 +15,7 @@ class CustomTextField extends StatelessWidget {
       mainAxisAlignment: MainAxisAlignment.start,
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        ?isLogin? null: Text(
+        if (!isLogin) Text(
           label??'Full name',
           style: GoogleFonts.poppins(
             color: Colors.black,
@@ -23,7 +23,7 @@ class CustomTextField extends StatelessWidget {
             fontWeight: FontWeight.w500,
           ),
         ),
-        ?isLogin? null:SizedBox(height: 5,),
+        if (!isLogin) SizedBox(height: 5,),
 
         TextField(
           controller: controller,
