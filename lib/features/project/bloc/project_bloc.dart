@@ -1,66 +1,30 @@
-import 'dart:io';
-
+// lib/features/project/bloc/project_bloc.dart
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
-import 'package:ipsum_user/core/utils/data_response.dart';
-import 'package:ipsum_user/features/project/data/project_data_src.dart';
+import 'package:ipsum_user/features/project/data/repositories/projects_repository.dart';
 import 'package:ipsum_user/features/project/model/project_model.dart';
 
 part 'project_event.dart';
 part 'project_state.dart';
 
 class ProjectBloc extends Bloc<ProjectEvent, ProjectState> {
-  final ProjectDataSource _dataSource = ProjectDataSource();
-  ProjectBloc() : super(ProjectListInitial());
-  @override
-  Stream<ProjectState> mapEventToState(ProjectEvent event) async* {
-    if (event is GetProjects) {
-      yield* getProjects();
-    }
-    else if (event is GetProjectDetails) {
-      yield* getProjectDetails();
-    }
-    else if (event is CreateProject) {
-      yield* getProjectDetails();
-    }
-    // else if (event is CreateProductEvent) {
-    //   yield* createProduct(
-    //       name: event.name,
-    //       description: event.description,
-    //       updatedBy: event.updatedBy,
-    //       image: event.image,
-    //       costingType: event.costingType);
-    // }
-    // else if (event is CreateAttributeEvent) {
-    //   yield* createAttribute(
-    //     name: event.name,
-    //     description: event.description,
-    //     image: event.image,);
-    // }
-    // else if (event is GetAllAttributes) {
-    //   yield* getAllAttributes();
-    // }
+  final ProjectsRepository repository;
+
+  ProjectBloc({required this.repository}) : super(const ProjectInitial()) {
+    on<FetchProjects>(_onFetchProjects);
   }
 
-  Stream<ProjectState> getProjects() async* {
-    yield ProjectListLoading();
-    final dataResponse = await _dataSource.getProjects();
-    if (dataResponse.data1) {
-      // print(",,,,,,,,,,,,,${dataResponse.data2[0]['name']}");
-      yield ProjectListSuccess(productList: dataResponse.data2);
-    } else {
-      yield ProjectListFailed();
+  Future<void> _onFetchProjects(
+    FetchProjects event,
+    Emitter<ProjectState> emit,
+  ) async {
+    emit(const ProjectLoading());
+
+    try {
+      final projects = await repository.getProjects();
+      emit(ProjectLoaded(projects: projects));
+    } catch (e) {
+      emit(ProjectError(message: e.toString()));
     }
   }
-  Stream<ProjectState> getProjectDetails() async* {
-    yield ProjectDetailsLoading();
-    final dataResponse = await _dataSource.projectDetails();
-    if (dataResponse.data1) {
-      yield ProjectDetailsSuccess(productList: dataResponse);
-    } else {
-      yield ProjectDetailsFailed();
-    }
-  }
-
-
 }

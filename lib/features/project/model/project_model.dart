@@ -1,78 +1,89 @@
-import 'package:json_annotation/json_annotation.dart';
-
-// part 'project_model.g.dart';
-class ProjectModel {
-  String? id;
-  String? name;
-  String? description;
-  @JsonKey(name: 'start_date')
-  String? startDate;
-  @JsonKey(name: 'due_date')
-  String? dueDate;
-  String? status;
-  String? priority;
-  @JsonKey(name: 'notify_due',defaultValue: false)
-  bool? notifyDue;
-  @JsonKey(name: 'created_at')
-  String? createdAt;
-  @JsonKey(name: 'updated_at')
-  String? updatedAt;
-  @JsonKey(name: 'created_by')
-  String? createdBy;
-  @JsonKey(name: 'updated_by')
-  String? updatedBy;
 
 
-  ProjectModel({this.id,
-    this.name,
-    this.description,
-    this.startDate,
-    this.dueDate,
-    this.status,
-    this.priority,
-    this.notifyDue,
-    this.createdAt,
-    this.updatedAt,
-    this.createdBy,
-    this.updatedBy
+import 'package:ipsum_user/features/users/model/user_model.dart';
+
+class ProjectMember {
+  final String id;
+  final UserModel user;
+  final String role;
+  final String joinedAt;   // ISO string
+  final String? leftAt;    // ISO string or null
+  final String createdAt;  // ISO string
+  final String updatedAt;  // ISO string
+
+  ProjectMember({
+    required this.id,
+    required this.user,
+    required this.role,
+    required this.joinedAt,
+    required this.leftAt,
+    required this.createdAt,
+    required this.updatedAt,
   });
 
-  ProjectModel.fromJson(Map<String, dynamic> json) {
-    // print();
-    id = json['id'];
-    name=json['name'];
-    description = json['description'];
-    startDate = json['start_date'];
-    dueDate = json['due_date'];
-    status = json['status'];
-    priority = json['priority'];
-    notifyDue = json['notify_due'];
-    createdAt = json['created_at'];
-    updatedAt = json['updated_at'];
-    createdBy = json['created_by'];
-    updatedBy = json['updated_by'];
+  factory ProjectMember.fromJson(Map<String, dynamic> json) {
+    return ProjectMember(
+      id: json['id'] as String,
+      user: UserModel.fromJson(json['user'] as Map<String, dynamic>),
+      role: (json['role'] as String?) ?? '',
+      joinedAt: (json['joined_at'] as String?) ?? '',
+      leftAt: json['left_at'] as String?,
+      createdAt: (json['created_at'] as String?) ?? '',
+      updatedAt: (json['updated_at'] as String?) ?? '',
+    );
   }
-  Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = <String, dynamic>{};
-    data['id'] = id;
-    data['name'] = name;
-    data['description'] = description;
-    data['start_date'] = startDate;
-    data['due_date'] = dueDate;
-    data['status'] = status;
-    data['priority'] = priority;
-    data['notify_due'] = notifyDue;
-    data['created_at'] = createdAt;
-    data['updated_at'] = updatedAt;
-    data['created_by'] = createdBy;
-    data['updated_by'] = updatedBy;
-
-
-    return data;
-  }
-  // factory ProjectModel.fromJson(Map<String, dynamic> srcJson) =>
-  //     _$ProjectFromJson(srcJson);
-  //
-  // Map<String, dynamic> toJson() => _$ProjectToJson(this);
 }
 
+class ProjectModel {
+  final String id;
+  final String name;
+  final String description;
+  final String startDate;   // "2025-10-01T00:00:00Z"
+  final String dueDate;     // "2025-12-31T00:00:00Z"
+  final String status;      // e.g. "on_progress"
+  final String priority;    // e.g. "low_priority"
+  final bool notifyDue;
+  final String createdAt;   // ISO string
+  final String updatedAt;   // ISO string
+  final List<ProjectMember> members;
+  final String createdBy;
+  final String? updatedBy;
+
+  ProjectModel({
+    required this.id,
+    required this.name,
+    required this.description,
+    required this.startDate,
+    required this.dueDate,
+    required this.status,
+    required this.priority,
+    required this.notifyDue,
+    required this.createdAt,
+    required this.updatedAt,
+    required this.members,
+    required this.createdBy,
+    required this.updatedBy,
+  });
+
+  factory ProjectModel.fromJson(Map<String, dynamic> json) {
+    final membersJson = json['members'] as List<dynamic>? ?? [];
+
+    return ProjectModel(
+      id: json['id'] as String,
+      name: json['name'] as String,
+      description: (json['description'] as String?) ?? '',
+      startDate: json['start_date'] as String,
+      dueDate: json['due_date'] as String,
+      status: json['status'] as String,
+      priority: json['priority'] as String,
+      notifyDue: (json['notify_due'] as bool?) ?? false,
+      createdAt: json['created_at'] as String,
+      updatedAt: json['updated_at'] as String,
+      members: membersJson
+          .map((e) => ProjectMember.fromJson(e as Map<String, dynamic>))
+          .toList(),
+      createdBy: json['created_by'] as String,
+      updatedBy: json['updated_by'] as String?,
+    );
+  }
+}

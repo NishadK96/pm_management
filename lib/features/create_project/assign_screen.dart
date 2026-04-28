@@ -71,7 +71,9 @@ class _AssignProjectScreenState extends State<AssignProjectScreen> {
           decoration:  InputDecoration(
               border: InputBorder.none,
               hintStyle: GoogleFonts.poppins(fontSize: 14),
-            // hint: Text("Search ...",style: GoogleFonts.poppins(fontSize: 14),),
+            hintText: "Search",
+            
+            // Text("Search ...",style: GoogleFonts.poppins(fontSize: 14),),
             suffixIcon: Container(padding: EdgeInsets.all(10),child: SvgPicture.string(IconConst().closeIcon,))
           ),
         ),
@@ -133,7 +135,7 @@ class _AssignProjectScreenState extends State<AssignProjectScreen> {
           Container(
             margin: EdgeInsets.symmetric(horizontal: 16),
 
-            child:LongButton(label:  'Assign Project' , onTap: (){})
+            child:LongButton(label:  'Assign Project' , onTap: ()async{})
 
 
           )

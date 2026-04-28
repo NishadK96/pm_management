@@ -1,37 +1,35 @@
+// lib/features/projects/bloc/project_state.dart
 part of 'project_bloc.dart';
 
 abstract class ProjectState extends Equatable {
   const ProjectState();
+
   @override
-  List<Object> get props => [];
+  List<Object?> get props => [];
 }
 
-class ProjectListInitial extends ProjectState {}
-
-class ProjectListLoading extends ProjectState {}
-
-class ProjectListSuccess extends ProjectState {
-  final List<ProjectModel>  productList;
-
-  const ProjectListSuccess({required this.productList});
+class ProjectInitial extends ProjectState {
+  const ProjectInitial();
 }
 
-class ProjectListFailed extends ProjectState {}
-class ProjectDetailsLoading extends ProjectState {}
-
-class ProjectDetailsSuccess extends ProjectState {
-  final  DoubleResponse productList;
-
-  const ProjectDetailsSuccess({required this.productList});
+class ProjectLoading extends ProjectState {
+  const ProjectLoading();
 }
 
-class ProjectDetailsFailed extends ProjectState {}
-class CreateProjectLoading extends ProjectState {}
+class ProjectLoaded extends ProjectState {
+  final List<ProjectModel> projects;
 
-class CreateProjectSuccess extends ProjectState {
-  final  String msg;
+  const ProjectLoaded({required this.projects});
 
-  const CreateProjectSuccess({required this.msg});
+  @override
+  List<Object?> get props => [projects];
 }
 
-class CreatePProjectFailed extends ProjectState {}
+class ProjectError extends ProjectState {
+  final String message;
+
+  const ProjectError({required this.message});
+
+  @override
+  List<Object?> get props => [message];
+}

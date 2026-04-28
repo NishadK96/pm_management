@@ -1,4 +1,4 @@
-package com.example.ipsum_user
+package com.shamshail.pm
 
 import io.flutter.embedding.android.FlutterActivity
 

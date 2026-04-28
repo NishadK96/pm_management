@@ -2,16 +2,33 @@ part of 'login_bloc.dart';
 
 abstract class LoginState extends Equatable {
   const LoginState();
+
   @override
-  List<Object> get props => [];
+  List<Object?> get props => [];
 }
-class SignInInitial extends LoginState {}
 
-class SignInLoading extends LoginState {}
+/// Initial
+class LoginInitial extends LoginState {}
 
-class SignInSuccess extends LoginState {}
+/// Loading (used for your button isLoading)
+class LoginLoading extends LoginState {}
 
-class SignInFailed extends LoginState {
-  final String? message;
-  const  SignInFailed({this.message});
+/// Success
+class LoginSuccess extends LoginState {
+  final Session session; // or your response model
+
+  const LoginSuccess({required this.session});
+
+  @override
+  List<Object?> get props => [session];
+}
+
+/// Failure
+class LoginFailure extends LoginState {
+  final String message;
+
+  const LoginFailure({required this.message});
+
+  @override
+  List<Object?> get props => [message];
 }

@@ -6,8 +6,9 @@ class CustomTextField extends StatelessWidget {
   final String? label;
   final TextEditingController? controller;
   final String? hint;
+  final bool readOnly;
   final  bool? isPassword;
-  const CustomTextField({super.key, this.label,this.isLogin=false,this.controller,this.hint,this.isPassword});
+  const CustomTextField({super.key, this.label,this.isLogin=false,this.controller,this.hint,this.isPassword,  this.readOnly=false});
 
   @override
   Widget build(BuildContext context) {
@@ -33,6 +34,7 @@ class CustomTextField extends StatelessWidget {
             hintStyle: TextStyle(
                 color: AppColors.labelGrey
             ),
+            
             border: OutlineInputBorder(borderRadius: BorderRadius.circular(8),borderSide: BorderSide(color: AppColors.grey)),
             disabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(8),borderSide: BorderSide(color: AppColors.grey)),
             focusedBorder:  OutlineInputBorder(borderRadius: BorderRadius.circular(8),borderSide: BorderSide(color: AppColors.primary)),

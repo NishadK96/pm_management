@@ -1,9 +1,9 @@
 import 'dart:io';
 import 'dart:math';
 import 'package:dio/dio.dart';
+import 'package:ipsum_user/core/urls.dart';
 import 'package:ipsum_user/core/utils/authenticate.dart';
 import 'package:ipsum_user/core/utils/data_response.dart';
-import 'package:ipsum_user/core/utils/urls.dart';
 import 'package:ipsum_user/features/login/data/login_data_src.dart';
 import 'package:ipsum_user/features/project/model/project_model.dart';
 import 'package:mime/mime.dart';
