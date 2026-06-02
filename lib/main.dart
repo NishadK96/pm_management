@@ -26,7 +26,7 @@ import 'features/login/domain/usecases/login_usecase.dart';
 import 'package:dio/dio.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 final appPrefs = sl<AppPrefs>();
-
+final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
   // // Build dependencies
   // final prefs = await SharedPreferences.getInstance();
   // final appPrefs = AppPrefs(prefs);
@@ -110,6 +110,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
+        navigatorKey: navigatorKey,
       debugShowCheckedModeBanner: false,
       title: 'Flutter Demo',
       theme: ThemeData(

@@ -91,12 +91,12 @@ class _LoginState extends State<Login> {
                     // Logo section
                     SizedBox(
                       width: double.infinity,
-                      height: size.height * 0.3,
+                      height: size.height * 0.45,
                       child: Container(
-                        padding: const EdgeInsets.all(90),
+                        padding: const EdgeInsets.all(3),
                         alignment: Alignment.center,
                         child: Image.asset(
-                          'assets/logo.png',
+                          'assets/logo_main-no_bg.png',
                           fit: BoxFit.cover,
                         ),
                       ),

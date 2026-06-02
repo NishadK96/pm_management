@@ -102,17 +102,20 @@ class LoginDataSource {
 
   LoginDataSource({Dio? dio}) : client = dio ?? Dio();
 
-  Future<UserModel> login({
-    required String email,
-    required String employeeCode,
-    required String password,
-    required String fcmToken,
-    required String deviceType,
-    required String deviceId,
-  }) async {
+ Future<UserModel> login({
+  required String email,
+  required String employeeCode,
+  required String password,
+  required String fcmToken,
+  required String deviceType,
+  required String deviceId,
+}) async {
+  try {
     final url =
         'https://backend.project-management-tool.shamshailksa.com/auth/user-login/';
-    print("api calledd");
+
+    print("API CALLED $url");
+
     final response = await client.post(
       url,
       data: {
@@ -132,19 +135,36 @@ class LoginDataSource {
         },
       ),
     );
-    print("responseee $response");
+
+    print("STATUS CODE: ${response.statusCode}");
+    print("RESPONSE DATA: ${response.data}");
+
     if (response.statusCode == 200) {
       final data = response.data as Map<String, dynamic>;
+
       if (data['status'] == 200 && data['data'] != null) {
-        return UserModel.fromJson(data['data'] as Map<String, dynamic>);
+        return UserModel.fromJson(
+          data['data'] as Map<String, dynamic>,
+        );
       } else {
         throw Exception(data['message'] ?? 'Login failed');
       }
     } else {
-      throw Exception('Login failed with code ${response.statusCode}');
+      throw Exception(
+        'Login failed with code ${response.statusCode}',
+      );
     }
+  } on DioException catch (e) {
+    print("DIO ERROR: ${e.message}");
+    print("DIO RESPONSE: ${e.response?.data}");
+    print("DIO STATUS: ${e.response?.statusCode}");
+    rethrow;
+  } catch (e, stack) {
+    print("LOGIN ERROR: $e");
+    print(stack);
+    rethrow;
   }
-
+}
   Future<DoubleResponse> updateAccessToken() async {
     String? token = authentication.authenticatedUser.refresh;
     print(PmUrls.tokenUpdateUrl);

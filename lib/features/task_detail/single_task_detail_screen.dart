@@ -1,25 +1,25 @@
+// lib/features/task_detail/single_task_detail_screen.dart
+
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/flutter_svg.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:ipsum_user/core/constants/icon_constants.dart';
-import 'package:ipsum_user/core/local/app_prefs.dart';
 import 'package:ipsum_user/core/theme/app_colors.dart';
-
-import 'package:ipsum_user/core/widgets/long_button.dart';
 import 'package:ipsum_user/core/widgets/title_widget.dart';
-import 'package:ipsum_user/features/create_project/widgets/date_time_row.dart';
-
 import 'package:ipsum_user/features/project/data/repositories/projects_repository.dart';
-import 'package:ipsum_user/features/task_detail/task_detail_card.dart';
 import 'package:ipsum_user/features/task_detail/model/task_model.dart';
 import 'package:ipsum_user/features/users/model/user_model.dart';
-
 import 'package:ipsum_user/injection_container.dart';
 
 class SingleTaskDetailScreen extends StatefulWidget {
   final TaskModel task;
+  final bool canUpdateStatus;
+  final bool canEditTask;
 
-  const SingleTaskDetailScreen({super.key, required this.task});
+  const SingleTaskDetailScreen({
+    super.key,
+    required this.task,
+    this.canUpdateStatus = false,
+    this.canEditTask = false,
+  });
 
   @override
   State<SingleTaskDetailScreen> createState() => _SingleTaskDetailScreenState();
@@ -35,21 +35,34 @@ class _SingleTaskDetailScreenState extends State<SingleTaskDetailScreen> {
     _currentStatus = widget.task.status;
   }
 
-  String _priorityLabel(String p) {
-    switch (p) {
+  String _priorityLabel(String priority) {
+    switch (priority) {
       case 'high_priority':
-        return 'High';
+        return 'High Priority';
       case 'medium_priority':
-        return 'Medium';
+        return 'Medium Priority';
       case 'low_priority':
-        return 'Low';
+        return 'Low Priority';
       default:
-        return p;
+        return priority;
     }
   }
 
-  Color _priorityColor(String p) {
-    switch (p) {
+  String _statusLabel(String status) {
+    switch (status) {
+      case 'on_progress':
+        return 'On Progress';
+      case 'completed':
+        return 'Completed';
+      case 'pending':
+        return 'Pending';
+      default:
+        return status;
+    }
+  }
+
+  Color _priorityColor(String priority) {
+    switch (priority) {
       case 'high_priority':
         return Colors.redAccent;
       case 'medium_priority':
@@ -61,377 +74,356 @@ class _SingleTaskDetailScreenState extends State<SingleTaskDetailScreen> {
     }
   }
 
-  String _statusLabel(String s) {
-    switch (s) {
-      case 'on_progress':
-        return 'On Progress';
+  Color _statusColor(String status) {
+    switch (status) {
       case 'completed':
-        return 'Completed';
+        return Colors.green;
+      case 'on_progress':
+        return AppColors.primary;
       case 'pending':
-        return 'Pending';
+        return Colors.orangeAccent;
       default:
-        return s;
+        return Colors.blueGrey;
     }
+  }
+
+  DateTime? _parseDate(String? value) {
+    if (value == null || value.isEmpty) return null;
+    return DateTime.tryParse(value);
+  }
+
+  String _formatDate(String? value) {
+    final date = _parseDate(value);
+    if (date == null) return '-';
+
+    final day = date.day.toString().padLeft(2, '0');
+    final month = date.month.toString().padLeft(2, '0');
+    final year = date.year.toString();
+
+    return '$day-$month-$year';
   }
 
   Future<void> _updateStatusOnServer() async {
     if (_isUpdating) return;
 
-    final appPrefs = sl<AppPrefs>();
-    final role = appPrefs.role;
-    final isCoordinator = role?.toLowerCase() == 'coordinator' ||
-        role?.toLowerCase() == 'co-ordinator';
-
-    if (!isCoordinator) {
-      // just in case someone reaches here without permission
+    if (!widget.canUpdateStatus) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Only coordinators can update tasks')),
+        const SnackBar(content: Text('You do not have permission to update this task')),
       );
       return;
     }
 
-    // project id from task model
-    final projectId = widget.task.project; // adjust if your field name differs
+    final projectId = widget.task.project;
     final taskId = widget.task.id;
 
     if (projectId == null || projectId.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('No project id found for this task')),
+        const SnackBar(content: Text('Project id not found for this task')),
       );
       return;
     }
 
-    final repo = sl<ProjectsRepository>();
-
     setState(() => _isUpdating = true);
+
     try {
+      final repo = sl<ProjectsRepository>();
+
       await repo.updateTaskStatus(
         projectId: projectId,
         taskId: taskId,
         status: _currentStatus,
       );
 
+      if (!mounted) return;
+
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Task status updated')),
+        const SnackBar(content: Text('Task status updated successfully')),
       );
-      // If you want to also mutate widget.task.status locally you can:
-     try {
-  await repo.updateTaskStatus(
-    projectId: projectId,
-    taskId: taskId,
-    status: _currentStatus,
-  );
 
-  ScaffoldMessenger.of(context).showSnackBar(
-    const SnackBar(content: Text('Task status updated')),
-  );
-
-  // ❌ remove this
-  // widget.task.status = _currentStatus;
-} catch (e) {
-  
-}
+      setState(() {});
     } catch (e) {
+      if (!mounted) return;
+
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('Failed to update status: $e')),
       );
     } finally {
-      if (mounted) setState(() => _isUpdating = false);
+      if (mounted) {
+        setState(() => _isUpdating = false);
+      }
     }
   }
 
   @override
   Widget build(BuildContext context) {
-    final appPrefs = sl<AppPrefs>();
-    final role = appPrefs.role;
-    final isCoordinator = role?.toLowerCase() == 'coordinator' ||
-        role?.toLowerCase() == 'co-ordinator';
-
-    // parse dates as DateTime if you want to reuse DateTimeRow
-    final DateTime startDate =
-        DateTime.tryParse(widget.task.startDate) ?? DateTime.now();
-    final DateTime endDate =
-        DateTime.tryParse(widget.task.endDate) ?? DateTime.now();
+    final task = widget.task;
 
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: const Color(0xFFF7F8FA),
       appBar: AppBar(
         backgroundColor: Colors.white,
-        title: TitleWidget(label: widget.task.name),
+        elevation: 0.5,
+        centerTitle: false,
+        title: TitleWidget(label: task.name),
       ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16),
         child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // ✅ Title + description
-            TaskDetailCard(
-              title: 'Task Title',
-              child: Padding(
-                padding: const EdgeInsets.only(right: 16.0),
-                child: TextFormField(
-                  initialValue: widget.task.description,
-                  maxLines: 4,
-                  readOnly: true,
-                  decoration: InputDecoration(
-                    border: InputBorder.none,
-                    hintText: widget.task.description.isEmpty
-                        ? 'No description'
-                        : null,
-                    hintStyle: GoogleFonts.poppins(fontSize: 14),
-                  ),
-                ),
-              ),
-            ),
-            const SizedBox(height: 12),
-
-            // ✅ Dates
-            TaskDetailCard(
-              child: Column(
-                children: [
-                  Row(
-                    children: [
-                      SvgPicture.string(IconConst().dateTimeIcon),
-                      const SizedBox(width: 10),
-                      Text(
-                        'Date and Time',
-                        style: GoogleFonts.poppins(
-                          color: const Color(0xFF151522),
-                          fontSize: 18,
-                          fontWeight: FontWeight.w500,
-                        ),
-                      ),
-                    ],
-                  ),
-                  const Divider(),
-                  DateTimeRow(label: 'Start Date', dateTime: startDate),
-                  DateTimeRow(label: 'End Date', dateTime: endDate),
-                ],
-              ),
-            ),
-            const SizedBox(height: 12),
-
-            // ✅ Priority + Status + Notify
-            TaskDetailCard(
-              title: 'Task Info',
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Row(
-                    children: [
-                      Text(
-                        'Priority: ',
-                        style: GoogleFonts.poppins(
-                          fontSize: 12,
-                          fontWeight: FontWeight.w500,
-                        ),
-                      ),
-                      Container(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 10,
-                          vertical: 4,
-                        ),
-                        decoration: BoxDecoration(
-                          color: _priorityColor(widget.task.priority)
-                              .withOpacity(0.12),
-                          borderRadius: BorderRadius.circular(20),
-                        ),
-                        child: Text(
-                          _priorityLabel(widget.task.priority),
-                          style: GoogleFonts.poppins(
-                            fontSize: 11,
-                            fontWeight: FontWeight.w600,
-                            color: _priorityColor(widget.task.priority),
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 8),
-                  Row(
-                    children: [
-                      Text(
-                        'Status: ',
-                        style: GoogleFonts.poppins(
-                          fontSize: 12,
-                          fontWeight: FontWeight.w500,
-                        ),
-                      ),
-                      Text(
-                        _statusLabel(_currentStatus),
-                        style: GoogleFonts.poppins(
-                          fontSize: 12,
-                          fontWeight: FontWeight.w400,
-                          color: AppColors.primary,
-                        ),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 8),
-                  Row(
-                    children: [
-                      Text(
-                        'Notify on due date: ',
-                        style: GoogleFonts.poppins(
-                          fontSize: 12,
-                          fontWeight: FontWeight.w500,
-                        ),
-                      ),
-                      Icon(
-                        widget.task.notifyDue
-                            ? Icons.check_circle
-                            : Icons.cancel,
-                        size: 16,
-                        color: widget.task.notifyDue
-                            ? Colors.green
-                            : Colors.redAccent,
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 8),
-                  Row(
-                    children: [
-                      Text(
-                        'Verification: ',
-                        style: GoogleFonts.poppins(
-                          fontSize: 12,
-                          fontWeight: FontWeight.w500,
-                        ),
-                      ),
-                      Text(
-                        widget.task.verificationStatus,
-                        style: GoogleFonts.poppins(
-                          fontSize: 12,
-                          fontWeight: FontWeight.w400,
-                        ),
-                      ),
-                    ],
-                  ),
-                ],
-              ),
-            ),
-            const SizedBox(height: 12),
-
-            // ✅ Assigned To (from assigned_to_data)
-            TaskDetailCard(
-              title: 'Assigned To',
-              child: widget.task.assignedToData.isEmpty
-                  ? Padding(
-                      padding: const EdgeInsets.symmetric(vertical: 8.0),
-                      child: Text(
-                        'No users assigned',
-                        style: GoogleFonts.poppins(
-                          fontSize: 12,
-                          color: AppColors.textGrey,
-                        ),
-                      ),
-                    )
-                  : Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        ...widget.task.assignedToData
-                            .map(_buildAssignedUserTile),
-                      ],
-                    ),
-            ),
-            const SizedBox(height: 12),
-
-            // 🔹 Coordinator-only: status update controls
-            if (isCoordinator) ...[
-              TaskDetailCard(
-                title: 'Update Status',
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      'Change task status',
-                      style: GoogleFonts.poppins(
-                        fontSize: 12,
-                        fontWeight: FontWeight.w500,
-                      ),
-                    ),
-                    const SizedBox(height: 8),
-                    Row(
-                      children: [
-                        Expanded(
-                          child: Container(
-                            padding:
-                                const EdgeInsets.symmetric(horizontal: 12),
-                            decoration: BoxDecoration(
-                              borderRadius: BorderRadius.circular(8),
-                              border: Border.all(
-                                color: const Color(0xFFE0E0E0),
-                              ),
-                            ),
-                            child: DropdownButtonHideUnderline(
-                              child: DropdownButton<String>(
-                                value: _currentStatus,
-                                items: const [
-                                  'on_progress',
-                                  'completed',
-                                  'pending',
-                                ].map((s) {
-                                  return DropdownMenuItem<String>(
-                                    value: s,
-                                    child: Text(
-                                      _statusLabel(s),
-                                      style: GoogleFonts.poppins(
-                                        fontSize: 13,
-                                      ),
-                                    ),
-                                  );
-                                }).toList(),
-                                onChanged: (value) {
-                                  if (value == null) return;
-                                  setState(() {
-                                    _currentStatus = value;
-                                  });
-                                },
-                              ),
-                            ),
-                          ),
-                        ),
-                        const SizedBox(width: 12),
-                        SizedBox(
-                          height: 40,
-                          child: ElevatedButton(
-                            onPressed:
-                                _isUpdating ? null : _updateStatusOnServer,
-                            child: _isUpdating
-                                ? const SizedBox(
-                                    height: 18,
-                                    width: 18,
-                                    child: CircularProgressIndicator(
-                                      strokeWidth: 2,
-                                      valueColor:
-                                          AlwaysStoppedAnimation<Color>(
-                                              Colors.white),
-                                    ),
-                                  )
-                                : const Text('Update'),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ],
-                ),
-              ),
-              const SizedBox(height: 12),
-            ],
-
-         LongButton(
-  label: "Back",
-  onTap: () async {
-    Navigator.pop(context);
-  },
-),
+            _buildTaskHeader(task),
+            const SizedBox(height: 14),
+            _buildTimelineCard(task),
+            const SizedBox(height: 14),
+            _buildInfoCard(task),
+            const SizedBox(height: 14),
+            _buildAssignedUsersCard(task),
+            const SizedBox(height: 14),
+            if (widget.canUpdateStatus) _buildUpdateStatusCard(),
+            const SizedBox(height: 20),
           ],
         ),
       ),
     );
   }
 
-  Widget _buildAssignedUserTile(UserModel u) {
-    final displayName = (u.fullName ?? u.username).trim();
+  Widget _buildTaskHeader(TaskModel task) {
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.all(18),
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          colors: [
+            AppColors.primary,
+            AppColors.primary.withOpacity(0.82),
+          ],
+        ),
+        borderRadius: BorderRadius.circular(18),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          _chip(
+            label: _statusLabel(_currentStatus),
+            color: Colors.white,
+            textColor: AppColors.primary,
+            backgroundColor: Colors.white,
+          ),
+          const SizedBox(height: 12),
+          Text(
+            task.name,
+            style: GoogleFonts.poppins(
+              fontSize: 20,
+              fontWeight: FontWeight.w700,
+              color: Colors.white,
+            ),
+          ),
+          const SizedBox(height: 8),
+          Text(
+            task.description.isNotEmpty
+                ? task.description
+                : 'No description available',
+            style: GoogleFonts.poppins(
+              fontSize: 13,
+              height: 1.5,
+              color: Colors.white.withOpacity(0.92),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildTimelineCard(TaskModel task) {
+    return _standardCard(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          _sectionTitle('Timeline'),
+          const SizedBox(height: 12),
+          Row(
+            children: [
+              Expanded(
+                child: _infoBox(
+                  title: 'Start Date',
+                  value: _formatDate(task.startDate),
+                  icon: Icons.calendar_today_outlined,
+                ),
+              ),
+              const SizedBox(width: 10),
+              Expanded(
+                child: _infoBox(
+                  title: 'End Date',
+                  value: _formatDate(task.endDate),
+                  icon: Icons.event_available_outlined,
+                ),
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildInfoCard(TaskModel task) {
+    return _standardCard(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          _sectionTitle('Task Information'),
+          const SizedBox(height: 14),
+          _infoRow(
+            icon: Icons.flag_outlined,
+            title: 'Priority',
+            value: _priorityLabel(task.priority),
+            color: _priorityColor(task.priority),
+          ),
+          const SizedBox(height: 12),
+          _infoRow(
+            icon: Icons.timelapse_outlined,
+            title: 'Status',
+            value: _statusLabel(_currentStatus),
+            color: _statusColor(_currentStatus),
+          ),
+          const SizedBox(height: 12),
+          _infoRow(
+            icon: task.notifyDue
+                ? Icons.notifications_active_outlined
+                : Icons.notifications_off_outlined,
+            title: 'Due Date Reminder',
+            value: task.notifyDue ? 'Enabled' : 'Disabled',
+            color: task.notifyDue ? Colors.green : Colors.redAccent,
+          ),
+          const SizedBox(height: 12),
+          _infoRow(
+            icon: Icons.verified_outlined,
+            title: 'Verification',
+            value: task.verificationStatus,
+            color: Colors.blueGrey,
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildAssignedUsersCard(TaskModel task) {
+    return _standardCard(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          _sectionTitle('Assigned Users'),
+          const SizedBox(height: 12),
+          if (task.assignedToData.isEmpty)
+            Text(
+              'No users assigned',
+              style: GoogleFonts.poppins(
+                fontSize: 12,
+                color: Colors.grey,
+              ),
+            )
+          else
+            Column(
+              children: task.assignedToData
+                  .map((user) => _buildAssignedUserTile(user))
+                  .toList(),
+            ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildUpdateStatusCard() {
+    return _standardCard(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          _sectionTitle('Update Status'),
+          const SizedBox(height: 6),
+          Text(
+            'Change the current progress status of this task.',
+            style: GoogleFonts.poppins(
+              fontSize: 12,
+              color: Colors.grey.shade600,
+            ),
+          ),
+          const SizedBox(height: 14),
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 12),
+            decoration: BoxDecoration(
+              color: const Color(0xFFF7F8FA),
+              borderRadius: BorderRadius.circular(12),
+              border: Border.all(color: const Color(0xFFE4E6EB)),
+            ),
+            child: DropdownButtonHideUnderline(
+              child: DropdownButton<String>(
+                value: _currentStatus,
+                isExpanded: true,
+                icon: const Icon(Icons.keyboard_arrow_down_rounded),
+                items: const [
+                  'pending',
+                  'on_progress',
+                  'completed',
+                ].map((status) {
+                  return DropdownMenuItem<String>(
+                    value: status,
+                    child: Text(
+                      _statusLabel(status),
+                      style: GoogleFonts.poppins(
+                        fontSize: 13,
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
+                  );
+                }).toList(),
+                onChanged: _isUpdating
+                    ? null
+                    : (value) {
+                        if (value == null) return;
+                        setState(() {
+                          _currentStatus = value;
+                        });
+                      },
+              ),
+            ),
+          ),
+          const SizedBox(height: 14),
+          SizedBox(
+            width: double.infinity,
+            height: 48,
+            child: ElevatedButton(
+              style: ElevatedButton.styleFrom(
+                backgroundColor: AppColors.primary,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(14),
+                ),
+              ),
+              onPressed: _isUpdating ? null : _updateStatusOnServer,
+              child: _isUpdating
+                  ? const SizedBox(
+                      height: 18,
+                      width: 18,
+                      child: CircularProgressIndicator(
+                        strokeWidth: 2,
+                        valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                      ),
+                    )
+                  : Text(
+                      'Update Status',
+                      style: GoogleFonts.poppins(
+                        fontSize: 14,
+                        fontWeight: FontWeight.w600,
+                        color: Colors.white,
+                      ),
+                    ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildAssignedUserTile(UserModel user) {
+    final displayName = (user.fullName ?? user.username).trim();
     final initials = displayName
         .split(' ')
         .where((p) => p.isNotEmpty)
@@ -440,26 +432,31 @@ class _SingleTaskDetailScreenState extends State<SingleTaskDetailScreen> {
         .join()
         .toUpperCase();
 
-    final role = u.roleName;
-    final email = u.email ?? '';
+    final role = user.roleName ?? '';
+    final email = user.email ?? '';
 
-    return Padding(
-      padding: const EdgeInsets.only(bottom: 8.0),
+    return Container(
+      margin: const EdgeInsets.only(bottom: 10),
+      padding: const EdgeInsets.all(12),
+      decoration: BoxDecoration(
+        color: const Color(0xFFF7F8FA),
+        borderRadius: BorderRadius.circular(14),
+      ),
       child: Row(
         children: [
           CircleAvatar(
-            radius: 18,
-            backgroundColor: AppColors.primary,
+            radius: 22,
+            backgroundColor: AppColors.primary.withOpacity(0.12),
             child: Text(
               initials,
               style: GoogleFonts.poppins(
-                fontSize: 12,
-                color: Colors.white,
-                fontWeight: FontWeight.w600,
+                fontSize: 13,
+                color: AppColors.primary,
+                fontWeight: FontWeight.w700,
               ),
             ),
           ),
-          const SizedBox(width: 10),
+          const SizedBox(width: 12),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -468,21 +465,26 @@ class _SingleTaskDetailScreenState extends State<SingleTaskDetailScreen> {
                   displayName,
                   style: GoogleFonts.poppins(
                     fontSize: 13,
-                    fontWeight: FontWeight.w600,
+                    fontWeight: FontWeight.w700,
+                    color: const Color(0xFF151522),
                   ),
                 ),
-                const SizedBox(height: 2),
-                Text(
-                  role??"",
-                  style: GoogleFonts.poppins(
-                    fontSize: 11,
-                    color: AppColors.textGrey,
+                if (role.isNotEmpty) ...[
+                  const SizedBox(height: 2),
+                  Text(
+                    role,
+                    style: GoogleFonts.poppins(
+                      fontSize: 11,
+                      color: Colors.grey.shade600,
+                    ),
                   ),
-                ),
+                ],
                 if (email.isNotEmpty) ...[
                   const SizedBox(height: 2),
                   Text(
                     email,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
                     style: GoogleFonts.poppins(
                       fontSize: 11,
                       color: Colors.blueGrey,
@@ -493,6 +495,141 @@ class _SingleTaskDetailScreenState extends State<SingleTaskDetailScreen> {
             ),
           ),
         ],
+      ),
+    );
+  }
+
+  Widget _standardCard({required Widget child}) {
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(16),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.04),
+            blurRadius: 12,
+            offset: const Offset(0, 4),
+          ),
+        ],
+      ),
+      child: child,
+    );
+  }
+
+  Widget _sectionTitle(String title) {
+    return Text(
+      title,
+      style: GoogleFonts.poppins(
+        fontSize: 15,
+        fontWeight: FontWeight.w700,
+        color: const Color(0xFF151522),
+      ),
+    );
+  }
+
+  Widget _infoBox({
+    required String title,
+    required String value,
+    required IconData icon,
+  }) {
+    return Container(
+      padding: const EdgeInsets.all(12),
+      decoration: BoxDecoration(
+        color: const Color(0xFFF7F8FA),
+        borderRadius: BorderRadius.circular(14),
+      ),
+      child: Row(
+        children: [
+          Icon(icon, size: 18, color: AppColors.primary),
+          const SizedBox(width: 8),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  title,
+                  style: GoogleFonts.poppins(
+                    fontSize: 10,
+                    color: Colors.grey,
+                  ),
+                ),
+                const SizedBox(height: 2),
+                Text(
+                  value,
+                  style: GoogleFonts.poppins(
+                    fontSize: 12,
+                    fontWeight: FontWeight.w600,
+                    color: const Color(0xFF151522),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _infoRow({
+    required IconData icon,
+    required String title,
+    required String value,
+    required Color color,
+  }) {
+    return Row(
+      children: [
+        Container(
+          height: 34,
+          width: 34,
+          decoration: BoxDecoration(
+            color: color.withOpacity(0.12),
+            borderRadius: BorderRadius.circular(10),
+          ),
+          child: Icon(icon, size: 18, color: color),
+        ),
+        const SizedBox(width: 12),
+        Expanded(
+          child: Text(
+            title,
+            style: GoogleFonts.poppins(
+              fontSize: 12,
+              color: Colors.grey.shade700,
+            ),
+          ),
+        ),
+        Text(
+          value,
+          style: GoogleFonts.poppins(
+            fontSize: 12,
+            fontWeight: FontWeight.w700,
+            color: color,
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _chip({
+    required String label,
+    required Color color,
+    Color? textColor,
+    Color? backgroundColor,
+  }) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+      decoration: BoxDecoration(
+        color: backgroundColor ?? color.withOpacity(0.12),
+        borderRadius: BorderRadius.circular(20),
+      ),
+      child: Text(
+        label,
+        style: GoogleFonts.poppins(
+          fontSize: 11,
+          fontWeight: FontWeight.w700,
+          color: textColor ?? color,
+        ),
       ),
     );
   }

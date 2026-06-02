@@ -1,8 +1,11 @@
 // lib/features/project/data/datasources/projects_data_source.dart
 import 'package:dio/dio.dart';
+import 'package:flutter/material.dart';
 import 'package:ipsum_user/core/local/app_prefs.dart';
+import 'package:ipsum_user/features/login/login.dart';
 import 'package:ipsum_user/features/project/model/project_model.dart';
 import 'package:ipsum_user/features/task_detail/model/task_model.dart';
+import 'package:ipsum_user/main.dart';
 
 class ProjectsDataSource {
   final Dio client;
@@ -12,55 +15,38 @@ class ProjectsDataSource {
     required this.client,
     required this.appPrefs,
   });
+  Future<void> _logoutUser() async {
+    await appPrefs.clearSession();
+
+    navigatorKey.currentState?.pushAndRemoveUntil(
+      MaterialPageRoute(
+        builder: (_) => const Login(),
+      ),
+      (route) => false,
+    );
+  }
+
   static const _projectsRootUrl =
       'https://backend.project-management-tool.shamshailksa.com/projects/';
   static const _projectsUrl =
       'https://backend.project-management-tool.shamshailksa.com/projects/projects/';
   static const _refreshUrl =
       'https://backend.project-management-tool.shamshailksa.com/auth/api/token/refresh/';
-Future<void> updateTaskStatus({
-  required String projectId,
-  required String taskId,
-  required String status,
-}) async {
-  final accessToken = appPrefs.accessToken;
-  if (accessToken == null || accessToken.isEmpty) {
-    throw Exception('No access token. Please login again.');
-  }
-
-  // /projects/<project_id>/tasks/<id>/
-  final url = '$_projectsRootUrl$projectId/tasks/$taskId/';
-
-  try {
-    final response = await client.patch(
-      url,
-      data: {
-        'status': status,
-      },
-      options: Options(
-        headers: {
-          'Accept': 'application/json',
-          'Authorization': 'Bearer $accessToken',
-        },
-      ),
-    );
-
-    if (response.statusCode != 200 && response.statusCode != 202) {
-      throw Exception('Failed to update task: ${response.statusCode}');
+  Future<void> updateTaskStatus({
+    required String projectId,
+    required String taskId,
+    required String status,
+  }) async {
+    final accessToken = appPrefs.accessToken;
+    if (accessToken == null || accessToken.isEmpty) {
+      throw Exception('No access token. Please login again.');
     }
-  } on DioError catch (e) {
-    if (e.response?.statusCode == 401) {
-      final refreshed = await _refreshToken();
-      if (!refreshed) {
-        throw Exception('Session expired. Please login again.');
-      }
 
-      final newAccess = appPrefs.accessToken;
-      if (newAccess == null || newAccess.isEmpty) {
-        throw Exception('No new access token after refresh.');
-      }
+    // /projects/<project_id>/tasks/<id>/
+    final url = '$_projectsRootUrl$projectId/tasks/$taskId/';
 
-      final retry = await client.patch(
+    try {
+      final response = await client.patch(
         url,
         data: {
           'status': status,
@@ -68,79 +54,108 @@ Future<void> updateTaskStatus({
         options: Options(
           headers: {
             'Accept': 'application/json',
-            'Authorization': 'Bearer $newAccess',
+            'Authorization': 'Bearer $accessToken',
           },
         ),
       );
 
-      if (retry.statusCode != 200 && retry.statusCode != 202) {
-        throw Exception(
-            'Failed to update task after refresh: ${retry.statusCode}');
+      if (response.statusCode != 200 && response.statusCode != 202) {
+        throw Exception('Failed to update task: ${response.statusCode}');
       }
-    } else {
-      rethrow;
+    } on DioError catch (e) {
+      if (e.response?.statusCode == 401) {
+        final refreshed = await _refreshToken();
+        if (!refreshed) {
+          throw Exception('Session expired. Please login again.');
+        }
+
+        final newAccess = appPrefs.accessToken;
+        if (newAccess == null || newAccess.isEmpty) {
+          throw Exception('No new access token after refresh.');
+        }
+
+        final retry = await client.patch(
+          url,
+          data: {
+            'status': status,
+          },
+          options: Options(
+            headers: {
+              'Accept': 'application/json',
+              'Authorization': 'Bearer $newAccess',
+            },
+          ),
+        );
+
+        if (retry.statusCode != 200 && retry.statusCode != 202) {
+          throw Exception(
+              'Failed to update task after refresh: ${retry.statusCode}');
+        }
+      } else {
+        rethrow;
+      }
     }
   }
-}
 
-Future<void> addMemberToProject({
-  required String projectId,
-  required String userId,
-}) async {
-  final accessToken = appPrefs.accessToken;
-  if (accessToken == null || accessToken.isEmpty) {
-    throw Exception('No access token. Please login again.');
-  }
-
-  final url = '$_projectsRootUrl$projectId/add-member/';
-  try {
-    final response = await client.post(
-      url,
-      data: {'user_id': userId},
-      options: Options(
-        headers: {
-          'Accept': 'application/json',
-          'Authorization': 'Bearer $accessToken',
-        },
-      ),
-    );
-
-    if (response.statusCode != 201 && response.statusCode != 200) {
-      throw Exception('Failed to add member: ${response.statusCode}');
+  Future<void> addMemberToProject({
+    required String projectId,
+    required String userId,
+  }) async {
+    final accessToken = appPrefs.accessToken;
+    if (accessToken == null || accessToken.isEmpty) {
+      throw Exception('No access token. Please login again.');
     }
-  } on DioError catch (e) {
-    if (e.response?.statusCode == 401) {
-      final refreshed = await _refreshToken();
-      if (!refreshed) {
-        throw Exception('Session expired. Please login again.');
-      }
 
-      final newToken = appPrefs.accessToken;
-      if (newToken == null || newToken.isEmpty) {
-        throw Exception('No new access token after refresh.');
-      }
-
-      final retryResponse = await client.post(
+    final url = '$_projectsRootUrl$projectId/add-member/';
+    try {
+      final response = await client.post(
         url,
         data: {'user_id': userId},
         options: Options(
           headers: {
             'Accept': 'application/json',
-            'Authorization': 'Bearer $newToken',
+            'Authorization': 'Bearer $accessToken',
           },
         ),
       );
 
-      if (retryResponse.statusCode != 201 &&
-          retryResponse.statusCode != 200) {
-        throw Exception(
-            'Failed to add member after refresh: ${retryResponse.statusCode}');
+      if (response.statusCode != 201 && response.statusCode != 200) {
+        throw Exception('Failed to add member: ${response.statusCode}');
       }
-    } else {
-      rethrow;
+    } on DioError catch (e) {
+      if (e.response?.statusCode == 401) {
+        final refreshed = await _refreshToken();
+        if (!refreshed) {
+          throw Exception('Session expired. Please login again.');
+        }
+
+        final newToken = appPrefs.accessToken;
+        if (newToken == null || newToken.isEmpty) {
+          throw Exception('No new access token after refresh.');
+        }
+
+        final retryResponse = await client.post(
+          url,
+          data: {'user_id': userId},
+          options: Options(
+            headers: {
+              'Accept': 'application/json',
+              'Authorization': 'Bearer $newToken',
+            },
+          ),
+        );
+
+        if (retryResponse.statusCode != 201 &&
+            retryResponse.statusCode != 200) {
+          throw Exception(
+              'Failed to add member after refresh: ${retryResponse.statusCode}');
+        }
+      } else {
+        rethrow;
+      }
     }
   }
-}
+
   Future<List<ProjectModel>> getProjects() async {
     print("calling get projects api");
     final accessToken = appPrefs.accessToken;
@@ -159,7 +174,7 @@ Future<void> addMemberToProject({
           },
         ),
       );
-print("responseee $response");
+      print("responseee $response");
       // 200 OK
       if (response.statusCode == 200) {
         return _parseProjects(response.data);
@@ -250,14 +265,14 @@ print("responseee $response");
           },
         ),
       );
-print("responseee $response");
+      print("responseee $response");
       if (response.statusCode == 201 || response.statusCode == 200) {
         final data = response.data['data'];
         return ProjectModel.fromJson(data as Map<String, dynamic>);
       }
 
       throw Exception('Failed to create project: ${response.statusCode}');
-    } on DioError catch (e) {
+    } on DioException catch (e) {
       // 401 → try refresh, then retry
       if (e.response?.statusCode == 401) {
         final refreshed = await _refreshToken();
@@ -330,7 +345,7 @@ print("responseee $response");
       }
 
       throw Exception('Failed to load tasks: ${response.statusCode}');
-    } on DioError catch (e) {
+    } on DioException catch (e) {
       if (e.response?.statusCode == 401) {
         final refreshed = await _refreshToken();
         if (!refreshed) {
@@ -365,15 +380,21 @@ print("responseee $response");
       rethrow;
     }
   }
-   static const String _baseUrl =
+
+  static const String _baseUrl =
       'https://backend.project-management-tool.shamshailksa.com';
 
   Future<Response> _authorizedGet(String path) async {
     final url = '$_baseUrl$path';
     final token = appPrefs.accessToken;
 
+    if (token == null || token.isEmpty) {
+      await _logoutUser();
+      throw Exception('No access token');
+    }
+
     try {
-      final response = await client.get(
+      return await client.get(
         url,
         options: Options(
           headers: {
@@ -382,13 +403,23 @@ print("responseee $response");
           },
         ),
       );
-      return response;
     } on DioException catch (e) {
-      // refresh on 401
       if (e.response?.statusCode == 401) {
-        await _refreshToken();
+        final refreshed = await _refreshToken();
+
+        if (!refreshed) {
+          await _logoutUser();
+          throw Exception('Session expired');
+        }
+
         final newToken = appPrefs.accessToken;
-        final retry = await client.get(
+
+        if (newToken == null || newToken.isEmpty) {
+          await _logoutUser();
+          throw Exception('No new access token');
+        }
+
+        return await client.get(
           url,
           options: Options(
             headers: {
@@ -397,24 +428,56 @@ print("responseee $response");
             },
           ),
         );
-        return retry;
       }
+
       rethrow;
     }
   }
 
- // 🔹 new: raw dashboard json
+  // 🔹 new: raw dashboard json
   Future<Map<String, dynamic>> getDashboardJson({
     required bool isCoordinator,
   }) async {
+    print(
+      "fetching dashboard data for ${isCoordinator ? 'coordinator' : 'chairman'}",
+    );
+
+    final accessToken = appPrefs.accessToken;
+    if (accessToken == null || accessToken.isEmpty) {
+      throw Exception('No access token. Please login again.');
+    }
+
     final path = isCoordinator
         ? '/projects/dashboard/mobile/coordinator/'
         : '/projects/dashboard/mobile/';
-    final response = await _authorizedGet(path);
-    final data = response.data as Map<String, dynamic>;
-    return data;
-  }
 
+    try {
+      final response = await _authorizedGet(path);
+
+      return response.data as Map<String, dynamic>;
+    } on DioError catch (e) {
+      if (e.response?.statusCode == 401) {
+        final refreshed = await _refreshToken();
+
+        if (!refreshed) {
+          throw Exception('Session expired. Please login again.');
+        }
+
+        final newAccess = appPrefs.accessToken;
+        if (newAccess == null || newAccess.isEmpty) {
+          throw Exception('No new access token after refresh.');
+        }
+
+        final retryResponse = await _authorizedGet(path);
+
+        return retryResponse.data as Map<String, dynamic>;
+      }
+
+      rethrow;
+    } catch (e) {
+      rethrow;
+    }
+  }
 
   Future<TaskModel> createTask({
     required String projectId,
@@ -518,6 +581,7 @@ print("responseee $response");
   // 🔹 your existing _refreshToken() is reused
   Future<bool> _refreshToken() async {
     final refreshToken = appPrefs.refreshToken;
+
     if (refreshToken == null || refreshToken.isEmpty) {
       return false;
     }
@@ -539,16 +603,18 @@ print("responseee $response");
         final newAccess = body['access'] as String?;
         final newRefresh = body['refresh'] as String?;
 
-        if (newAccess == null || newRefresh == null) return false;
+        if (newAccess == null || newRefresh == null) {
+          return false;
+        }
 
         await appPrefs.updateTokens(
           accessToken: newAccess,
           refreshToken: newRefresh,
         );
+
         return true;
       }
-      return false;
-    } on DioError {
+
       return false;
     } catch (_) {
       return false;
