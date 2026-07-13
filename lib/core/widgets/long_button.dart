@@ -20,23 +20,18 @@ class LongButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final bool isDisabled = false;
     return Material(
       color: Colors.transparent,
       child: InkWell(
         borderRadius: BorderRadius.circular(12),
-        onTap: isDisabled
-            ? null
-            : () async {
+        onTap: () async {
                 await onTap!();
               },
         child: Ink(
           width: double.infinity,
           height: 56,
           decoration: BoxDecoration(
-            color: isDisabled
-                ? AppColors.primary.withOpacity(0.4)
-                : AppColors.primary,
+            color: AppColors.primary,
             borderRadius: BorderRadius.circular(12),
             border: Border.all(
               color: const Color(0xFFE6ECF0),

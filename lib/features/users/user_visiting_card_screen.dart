@@ -630,7 +630,7 @@ class VisitingCardPresetView extends StatelessWidget {
 class CleanWhiteCard extends StatelessWidget {
   final UserModel user;
 
-  static const String logo = 'assets/icon/logo_bg.png';
+  static const String logo = 'assets/full_text_logo.png';
 
   const CleanWhiteCard({
     super.key,
@@ -650,78 +650,111 @@ class CleanWhiteCard extends StatelessWidget {
         child: Stack(
           children: [
             Positioned(
-              right: -50,
-              bottom: -50,
-              child: _decorCircle(150, AppColors.primary.withOpacity(0.08)),
+              right: -55,
+              bottom: -55,
+              child: _decorCircle(
+                150,
+                AppColors.primary.withOpacity(0.08),
+              ),
             ),
+
             Padding(
-              padding: const EdgeInsets.all(10),
-              child: Column(
+              padding: const EdgeInsets.all(16),
+              child: Row(
                 children: [
-                  Row(
-                    children: [
-                      Image.asset(
-                        logo,
-                        height: 30,
-                        color: Colors.black,
-                      ),
-                      const SizedBox(width: 8),
-                      Expanded(
-                        child: Text(
-                          'SHAMS HAIL\nTrading Co.',
+                  // LEFT SIDE: logo + profile
+                  SizedBox(
+                    width: 118,
+                    child: Column(
+                      children: [
+                        SizedBox(
+                          height: 54,
+                          width: 112,
+                          child: Image.asset(
+                            logo,
+                            color: AppColors.primary,
+                            fit: BoxFit.contain,
+                          ),
+                        ),
+
+                        const Spacer(),
+
+                        _profileImage(data, dark: false),
+
+                        const Spacer(),
+
+                        Container(
+                          width: 52,
+                          height: 3,
+                          decoration: BoxDecoration(
+                            color: AppColors.primary,
+                            borderRadius: BorderRadius.circular(99),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+
+                  const SizedBox(width: 18),
+
+                  // RIGHT SIDE: user details
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        const Spacer(),
+
+                        Text(
+                          data.name.toUpperCase(),
+                          maxLines: 2,
+                          overflow: TextOverflow.ellipsis,
                           style: GoogleFonts.poppins(
-                            fontSize: 10,
+                            fontSize: 17,
                             height: 1.15,
                             fontWeight: FontWeight.w800,
                             color: const Color(0xFF151522),
                           ),
                         ),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 10),
-                  Row(
-                    children: [
-                      _profileImage(data, dark: false),
-                      const SizedBox(width: 16),
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              data.name.toUpperCase(),
-                              maxLines: 1,
-                              overflow: TextOverflow.ellipsis,
-                              style: GoogleFonts.poppins(
-                                fontSize: 17,
-                                fontWeight: FontWeight.w800,
-                                color: const Color(0xFF151522),
-                              ),
+
+                        if (data.role.isNotEmpty) ...[
+                          const SizedBox(height: 4),
+                          Text(
+                            data.role,
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                            style: GoogleFonts.poppins(
+                              fontSize: 11,
+                              color: Colors.grey.shade600,
+                              fontWeight: FontWeight.w500,
                             ),
-                            if (data.role.isNotEmpty)
-                              Text(
-                                data.role,
-                                style: GoogleFonts.poppins(
-                                  fontSize: 11,
-                                  color: Colors.grey.shade600,
-                                ),
-                              ),
-                          ],
-                        ),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 6),
-                  if (data.phone.isNotEmpty)
-                    _contactLineLight(Icons.phone_outlined, data.phone),
-                  if (data.email.isNotEmpty)
-                    _contactLineLight(Icons.email_outlined, data.email),
-                  if (data.address.isNotEmpty)
-                    _contactLineLight(
-                      Icons.location_on_outlined,
-                      data.address,
-                      maxLines: 1,
+                          ),
+                        ],
+
+                        const SizedBox(height: 14),
+
+                        if (data.phone.isNotEmpty)
+                          _contactLineLight(
+                            Icons.phone_outlined,
+                            data.phone,
+                          ),
+
+                        if (data.email.isNotEmpty)
+                          _contactLineLight(
+                            Icons.email_outlined,
+                            data.email,
+                          ),
+
+                        if (data.address.isNotEmpty)
+                          _contactLineLight(
+                            Icons.location_on_outlined,
+                            data.address,
+                            maxLines: 1,
+                          ),
+
+                        const Spacer(),
+                      ],
                     ),
+                  ),
                 ],
               ),
             ),
@@ -812,12 +845,13 @@ class DarkPremiumCard extends StatelessWidget {
                   const SizedBox(width: 18),
                   Expanded(
                     child: Padding(
-                      padding: const EdgeInsets.symmetric(vertical: 2,horizontal: 5),
+                      padding: const EdgeInsets.symmetric(
+                          vertical: 2, horizontal: 5),
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           _companyHeaderDark(),
-                          const SizedBox(height: 15),
+                          const SizedBox(height: 2),
                           Text(
                             data.name.toUpperCase(),
                             maxLines: 1,
@@ -874,33 +908,15 @@ class DarkPremiumCard extends StatelessWidget {
   }
 
   Widget _companyHeaderDark() {
-    return Row(
-      children: [
-        Container(
-          height: 34,
-          width: 34,
-          padding: const EdgeInsets.all(5),
-          // decoration: BoxDecoration(
-          //   color: Colors.white,
-          //   borderRadius: BorderRadius.circular(11),
-          // ),
-          child: Image.asset(logo, fit: BoxFit.contain),
-        ),
-        const SizedBox(width: 8),
-        Expanded(
-          child: Text(
-            'SHAMS HAIL\nTrading Co.',
-            maxLines: 2,
-            overflow: TextOverflow.ellipsis,
-            style: GoogleFonts.poppins(
-              fontSize: 10,
-              height: 1.15,
-              color: Colors.white,
-              fontWeight: FontWeight.w800,
-            ),
-          ),
-        ),
-      ],
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.only(bottom: 4),
+      child: Image.asset(
+        "assets/full_text_logo.png",
+        height: 55,
+        fit: BoxFit.fitHeight,
+        alignment: Alignment.centerLeft,
+      ),
     );
   }
 }
@@ -954,15 +970,13 @@ class BlueCorporateCard extends StatelessWidget {
                       _profileImage(data),
                       const SizedBox(height: 12),
                       Container(
-                        height: 36,
-                        width: 82,
-                        padding: const EdgeInsets.all(6),
-                        // decoration: BoxDecoration(
-                        //   color: Colors.white,
-                        //   borderRadius: BorderRadius.circular(13),
-                        // ),
-                        child: Image.asset(logo, fit: BoxFit.contain),
-                      ),
+                        height: 55,
+                        width: 140,
+                        child: Image.asset(
+                          "assets/full_text_logo.png",
+                          fit: BoxFit.contain,
+                        ),
+                      )
                     ],
                   ),
                   const SizedBox(width: 18),

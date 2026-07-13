@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:ipsum_user/core/theme/app_colors.dart';
-import 'package:ipsum_user/features/create_project/widgets/calender_card.dart';
-import 'package:table_calendar/table_calendar.dart';
 import 'package:intl/intl.dart';
 
 class CalenderScreen  extends StatefulWidget {

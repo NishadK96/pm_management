@@ -16,6 +16,7 @@ import 'package:ipsum_user/features/dashboard/widget/project_list.dart';
 import 'package:ipsum_user/features/notification/notification_screen.dart';
 import 'package:ipsum_user/features/profile/profile_screen.dart';
 import 'package:ipsum_user/features/project/project_screen.dart';
+import 'package:ipsum_user/features/users/company_documents_screen.dart';
 import 'package:ipsum_user/features/users/data/repositories/users_repository.dart';
 import 'package:ipsum_user/features/users/model/user_profile_model.dart';
 import 'package:ipsum_user/features/users/users_list_screen.dart';
@@ -72,6 +73,9 @@ class _DashboardScreenState extends State<DashboardScreen> {
 
     final isCoordinator = role == 'coordinator' || role == 'co-ordinator';
     final isChairman = role == 'chairman';
+    final isDirector = role == 'director';
+
+    final canViewCompanyDocuments = isChairman || isDirector || isCoordinator;
 
     if (!_initialized) {
       _initialized = true;
@@ -106,6 +110,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                     context: context,
                     state: state,
                     isChairman: isChairman,
+                    canViewCompanyDocuments: canViewCompanyDocuments,
                   ),
                 ),
               ),
@@ -233,6 +238,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
     required BuildContext context,
     required DashboardState state,
     required bool isChairman,
+    required bool canViewCompanyDocuments,
   }) {
     if (state is DashboardLoading || state is DashboardInitial) {
       return const Padding(
@@ -354,6 +360,24 @@ class _DashboardScreenState extends State<DashboardScreen> {
           ],
         ),
         const SizedBox(height: 18),
+        const SizedBox(height: 18),
+        if (canViewCompanyDocuments) ...[
+          GestureDetector(
+            onTap: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (_) => const CompanyDocumentsScreen(),
+                ),
+              );
+            },
+            child: const DashboardButton(
+              label: 'Company Documents',
+              icon: Icons.business_center_outlined,
+            ),
+          ),
+          const SizedBox(height: 12),
+        ],
         if (isChairman) ...[
           GestureDetector(
             onTap: () {
